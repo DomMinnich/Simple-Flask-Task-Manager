@@ -13,12 +13,15 @@
       body {
         color: rgb(6, 148, 235);
         background-color: rgb(55, 55, 55);
+        font-family: "Lucida Console", Courier, monospace;
+        font-size: 1.2rem;
       }
       .list-group-item {
         background-color: rgb(55, 55, 55);
         border-color: rgb(0, 103, 168);
         color: rgb(255, 255, 255);
       }
+
       .highlight-log {
         background-color: #42bbf3;
       }
@@ -29,6 +32,14 @@
       .modal-footer {
         color: rgb(0, 0, 0);
       }
+
+      hr{
+        background-color: #808080;
+        height: 2px;
+      }
+
+    
+
     </style>
   </head>
   <body>
@@ -45,24 +56,33 @@
             name="title"
             required
           />
+          <label for="description">Task Description:</label>
+          <input
+            type="text"
+            class="form-control"
+            id="description"
+            name="description"
+            required
+          />
         </div>
         <button type="submit" class="btn btn-primary">Add Task</button>
       </form>
+      <br />
 
       <ul class="list-group">
         {% for task in tasks %}
-        <li class="list-group-item">
-          {{ task.title }} {% if task.completed %}
+        <li class="list-group-item cut-text">
+          {{ task.title }} <br>{{ task.description|split_every_100_chars }} <br>{% if task.completed %}
           <span class="badge badge-success">Completed</span>
           <span class="badge badge-info"
-            >{{ task.completed_at.strftime('%B %d, %Y') | default('N/A')
+            >{{ task.completed_at.strftime('%B %d, %Y, %I:%M %p' | default('N/A'))
             }}</span
           >
           {% else %}
           <span class="badge badge-danger">Not Completed</span>
           {% if task.last_completed_at is defined %}
           <span class="badge badge-info"
-            >Last Completed:{{ task.last_completed_at.strftime('%B %d, %Y')
+            >Last Completed:{{ task.last_completed_at.strftime('%B %d, %Y, %I:%M %p')
             }}</span
           >
           {% else %}
@@ -148,8 +168,12 @@
         {% endfor %}
       </ul>
 
-      <h2 class="mt-5">Logs</h2>
+      <hr>
+
+      <h2 class="mt-5">Task Log</h2>
+      <button class="btn btn-primary" onclick="location.href='{{ url_for('delete_logs') }}'">Delete Logs</button>
       <ul class="list-group">
+        <br/>
         {% for log in logs[::-1] %} {# Reverse the order of logs to display
         newest first #}
         <li class="list-group-item">{{ log }}</li>
@@ -168,22 +192,22 @@
         }, 100000);
       });
 
+
+      
       function highlightLogs(taskTitle) {
         // Find all list items containing logs
         var logItems = document.querySelectorAll(".list-group-item");
-
-        // Remove existing highlights
+    
+        // Toggle highlights
         logItems.forEach(function (item) {
-          item.classList.remove("highlight-log");
-        });
-
-        // Highlight logs containing the task title
-        logItems.forEach(function (item) {
-          if (item.innerText.includes(taskTitle)) {
-            item.classList.add("highlight-log");
+          if (item.innerText.includes("'"+taskTitle+"'")) {
+            item.classList.toggle("highlight-log");
+          } else {
+            item.classList.remove("highlight-log");
           }
         });
       }
+
     </script>
   </body>
 </html>

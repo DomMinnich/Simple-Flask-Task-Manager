@@ -13,6 +13,7 @@
 from flask import Flask, render_template, request, redirect, url_for
 from datetime import datetime, timedelta
 import json
+from markupsafe import Markup, escape
 
 app = Flask(__name__)
 
@@ -58,6 +59,8 @@ def save_data():
     with open("data.json", "w") as file:
         json.dump({"tasks": tasks, "logs": logs}, file, cls=DateTimeEncoder)
 
+
+
 # Routes
 @app.route("/")
 def index():
@@ -69,15 +72,18 @@ def index():
 @app.route("/add_task", methods=["POST"])
 def add_task():
     title = request.form.get("title")
-    
+    description = request.form.get("description")
+
     if title:
         new_task = {
             "title": title,
+            "description": description,
             "created_at": datetime.now(),
             "completed": False
         }
         tasks.append(new_task)
-        logs.append(f"Task '{title}' added at {datetime.now()}")
+        created_date = new_task["created_at"].strftime("%B %d, %Y, %I:%M %p")
+        logs.append(f" '{title}' added at {created_date}")
         save_data()
 
     return redirect(url_for("index"))
@@ -86,11 +92,19 @@ def add_task():
 @app.route("/complete_task/<int:task_index>")
 def complete_task(task_index):
     if 0 <= task_index < len(tasks):
-        tasks[task_index]["completed"] = True
-        tasks[task_index]["completed_at"] = datetime.now()
-        logs.append(f"Task '{tasks[task_index]['title']}' completed at {datetime.now()}")
-        save_data()
+        if not tasks[task_index]["completed"]:
+            tasks[task_index]["completed"] = True
+            tasks[task_index]["completed_at"] = datetime.now()
+            completed_date = tasks[task_index]["completed_at"].strftime("%B %d, %Y, %I:%M %p")
+            logs.append(f" '{tasks[task_index]['title']}' completed at {completed_date}")
+            save_data()
 
+    return redirect(url_for("index"))
+
+@app.route("/delete_logs")
+def delete_logs():
+    logs.clear()
+    save_data()
     return redirect(url_for("index"))
 
 # Delete a task route
@@ -98,8 +112,9 @@ def complete_task(task_index):
 def delete_task(task_index):
     if 0 <= task_index < len(tasks):
         deleted_title = tasks[task_index]["title"]
+        deleted_date = datetime.now().strftime("%B %d, %Y, %I:%M %p")
         del tasks[task_index]
-        logs.append(f"Task '{deleted_title}' deleted at {datetime.now()}")
+        logs.append(f" '{deleted_title}' deleted at {deleted_date}")
         save_data()
 
     return redirect(url_for("index"))
@@ -115,17 +130,24 @@ def highlight_logs(task_title):
 @app.route("/reset_task/<int:task_index>")
 def reset_task(task_index):
     if 0 <= task_index < len(tasks):
-        tasks[task_index]["completed"] = False
-        logs.append(f"Task '{tasks[task_index]['title']}' reset at {datetime.now()}")
-        
-        # If the task was previously completed, update last_completed_at
-        if "completed_at" in tasks[task_index]:
-            tasks[task_index]["last_completed_at"] = tasks[task_index]["completed_at"]
-            del tasks[task_index]["completed_at"]
+        if tasks[task_index]["completed"]:
+            tasks[task_index]["completed"] = False
+            reset_date = datetime.now().strftime("%B %d, %Y, %I:%M %p")
+            logs.append(f" '{tasks[task_index]['title']}' reset at {reset_date}")
             
-        save_data()
+            # If the task was previously completed, update last_completed_at
+            if "completed_at" in tasks[task_index]:
+                tasks[task_index]["last_completed_at"] = tasks[task_index]["completed_at"]
+                del tasks[task_index]["completed_at"]
+                
+            save_data()
 
     return redirect(url_for("index"))
+
+@app.template_filter()
+def split_every_100_chars(value):
+    result = '- '.join(value[i:i+74] for i in range(0, len(value), 100))
+    return Markup(result)
 
 # Run the app
 if __name__ == "__main__":

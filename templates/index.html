@@ -79,7 +79,7 @@
             }}</span
           >
           {% else %}
-          <span class="badge badge-danger">Not Completed</span>
+          <span class="badge badge-danger">Not Complete</span>
           {% if task.last_completed_at is defined %}
           <span class="badge badge-info"
             >Last Completed:{{ task.last_completed_at.strftime('%B %d, %Y, %I:%M %p')

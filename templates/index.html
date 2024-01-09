@@ -23,10 +23,12 @@
         background-color: #42bbf3;
       }
 
-      .modal-title, .modal-body, modal-fade, .modal-footer {
+      .modal-title,
+      .modal-body,
+      modal-fade,
+      .modal-footer {
         color: rgb(0, 0, 0);
       }
-
     </style>
   </head>
   <body>
@@ -160,6 +162,12 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
     <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        setInterval(function () {
+          location.reload();
+        }, 100000);
+      });
+
       function highlightLogs(taskTitle) {
         // Find all list items containing logs
         var logItems = document.querySelectorAll(".list-group-item");

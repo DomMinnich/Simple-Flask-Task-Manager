@@ -33,13 +33,10 @@
         color: rgb(0, 0, 0);
       }
 
-      hr{
+      hr {
         background-color: #808080;
         height: 2px;
       }
-
-    
-
     </style>
   </head>
   <body>
@@ -72,18 +69,19 @@
       <ul class="list-group">
         {% for task in tasks %}
         <li class="list-group-item cut-text">
-          {{ task.title }} <br>{{ task.description|split_every_100_chars }} <br>{% if task.completed %}
+          {{ task.title }} <br />{{ task.description|split_every_100_chars }}
+          <br />{% if task.completed %}
           <span class="badge badge-success">Completed</span>
           <span class="badge badge-info"
-            >{{ task.completed_at.strftime('%B %d, %Y, %I:%M %p' | default('N/A'))
-            }}</span
+            >{{ task.completed_at.strftime('%B %d, %Y, %I:%M %p' |
+            default('N/A')) }}</span
           >
           {% else %}
           <span class="badge badge-danger">Not Complete</span>
           {% if task.last_completed_at is defined %}
           <span class="badge badge-info"
-            >Last Completed:{{ task.last_completed_at.strftime('%B %d, %Y, %I:%M %p')
-            }}</span
+            >Last Completed:{{ task.last_completed_at.strftime('%B %d, %Y, %I:%M
+            %p') }}</span
           >
           {% else %}
           <span class="badge badge-info">N/A</span>
@@ -168,13 +166,23 @@
         {% endfor %}
       </ul>
 
-      <hr>
+      <hr />
 
       <h2 class="mt-5">Task Log</h2>
-      <button class="btn btn-success" onclick="location.href='{{ url_for('download_logs') }}'">Download Logs</button>
-      <button class="btn btn-primary" onclick="location.href='{{ url_for('delete_logs') }}'">Delete Logs</button>
+      <button
+        class="btn btn-success"
+        onclick="location.href='{{ url_for('download_logs') }}'"
+      >
+        Download Logs
+      </button>
+      <button
+        class="btn btn-primary"
+        onclick="location.href='{{ url_for('delete_logs') }}'"
+      >
+        Delete Logs
+      </button>
       <ul class="list-group">
-        <br/>
+        <br />
         {% for log in logs[::-1] %} {# Reverse the order of logs to display
         newest first #}
         <li class="list-group-item">{{ log }}</li>
@@ -193,22 +201,27 @@
         }, 100000);
       });
 
+      $(document).ready(function () {
+        $(window).scrollTop(localStorage.getItem("scrollPosition"));
+      });
 
-      
+      $(window).on("scroll", function () {
+        localStorage.setItem("scrollPosition", $(window).scrollTop());
+      });
+
       function highlightLogs(taskTitle) {
         // Find all list items containing logs
         var logItems = document.querySelectorAll(".list-group-item");
-    
+
         // Toggle highlights
         logItems.forEach(function (item) {
-          if (item.innerText.includes("'"+taskTitle+"'")) {
+          if (item.innerText.includes("'" + taskTitle + "'")) {
             item.classList.toggle("highlight-log");
           } else {
             item.classList.remove("highlight-log");
           }
         });
       }
-
     </script>
   </body>
 </html>

@@ -10,7 +10,8 @@
 #
 
 # Importing the required modules
-from flask import Flask, render_template, request, redirect, url_for
+import os
+from flask import Flask, make_response, render_template, request, redirect, url_for
 from datetime import datetime, timedelta
 import json
 from markupsafe import Markup, escape
@@ -101,8 +102,26 @@ def complete_task(task_index):
 
     return redirect(url_for("index"))
 
+# Download logs route
+@app.route("/download_logs")
+def download_logs():
+    log_text = "\n".join(logs)
+    
+    response = make_response(log_text)
+    response.headers["Content-Disposition"] = "attachment; filename=logs.txt"
+    response.headers["Content-type"] = "text/plain"
+    
+    # Save logs to Data/logs.txt
+    logs_file_path = os.path.join("Data/logs", datetime.now().strftime("%Y%m%d%" + "H%M%S") + "YMD+HMS.txt")
+    with open(logs_file_path, "w") as logs_file:
+        logs_file.write(log_text)
+
+    return response
+
+# Delete logs route
 @app.route("/delete_logs")
 def delete_logs():
+    download_logs()  # Call the download_logs function before deleting logs
     logs.clear()
     save_data()
     return redirect(url_for("index"))

@@ -1,9 +1,7 @@
-Simple task manager using Flask
+Simple task manager using Flask (server)
 
 
 Early Looks
 
-
-
-https://github.com/DomMinnich/Simple-Flask-Task-Manager/assets/113619219/df8e6588-4ace-4a26-9a3e-ba292bbeee28
+https://github.com/DomMinnich/Simple-Flask-Task-Manager/assets/113619219/fdc212ce-6377-4462-91b0-8425c9708561
 

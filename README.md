@@ -1,3 +1,5 @@
+Note to self: This logic was overhauled and inputted into my commercial ticketing system
+
 Simple task manager using Flask (server)
 
 
